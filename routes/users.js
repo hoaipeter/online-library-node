@@ -45,9 +45,9 @@ router.patch('/:userId', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  const { name, email, phone, role, password, cpassword } = req.body;
+  const { firstname, lastname, email, phone, role, password, cpassword } = req.body;
 
-  if (!name || !email || !phone || !role || !password || !cpassword) {
+  if (!firstname || !lastname || !email || !phone || !role || !password || !cpassword) {
     return res.status(422).json({ error: 'Please Enter All Details' });
   }
 
@@ -56,7 +56,7 @@ router.post('/', async (req, res) => {
     if (userExist) {
       return res.status(422).json({ error: 'Email already exists' });
     }
-    const user = new User({ name, email, phone, role, password, cpassword });
+    const user = new User({ firstname, lastname, email, phone, role, password, cpassword });
     await user.save();
     res.status(200).json({ message: 'user registered successfully' });
   } catch (err) {

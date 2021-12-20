@@ -7,23 +7,23 @@ const User = require('../models/User');
 const { registerValidation } = require('../validation/validation');
 
 router.post('/register', async (req, res) => {
-  const { name, email, phone, role, password, cpassword } = req.body;
+  const { firstname, lastname, email, phone, role, password, cpassword } = req.body;
 
-  if (!name || !email || !phone || !role || !password || !cpassword) {
+  if (!firstname || !lastname || !email || !phone || !role || !password || !cpassword) {
     return res.status(422).json({ error: 'Please Enter All Details' });
   }
   // Validation
   const { error } = registerValidation(req.body);
-  if (error) return res.status(422).send(error.details[0].message);
+  if (error) return res.status(422).json({ error: error.details[0].message });
 
   try {
     const userExist = await User.findOne({ email: email });
     if (userExist) {
       return res.status(422).json({ error: 'Email already exists' });
-    } else if (password != cpassword) {
+    } else if (password !== cpassword) {
       return res.status(422).json({ error: 'Passwords are not matching' });
     } else {
-      const user = new User({ name, email, phone, role, password, cpassword });
+      const user = new User({ firstname, lastname, email, phone, role, password, cpassword });
       await user.save();
       res.status(201).json({ message: 'User registered successfully' });
     }
@@ -49,7 +49,9 @@ router.post('/signin', async (req, res) => {
 
       res.cookie('jwtoken', token, {
         expires: new Date(Date.now() + 25892000000),
-        httpOnly: true
+        httpOnly: true,
+        sameSite: 'none',
+        secure: true
       });
 
       if (!isMatch) {
